@@ -40,24 +40,21 @@ export const useEditorStore = defineStore('editor', () => {
     return pathElements.value[activePathIndex.value] ?? null
   })
 
-  const viewBox = computed(() => {
-    if (!document.value) return '0 0 400 400'
-    const { rootAttrs } = document.value
-    const rawVb = rootAttrs.viewBox ?? `0 0 ${parseFloat(rootAttrs.width ?? '400')} ${parseFloat(rootAttrs.height ?? '400')}`
-    const parts = rawVb.split(/[\s,]+/).map(parseFloat)
-    const origW = parts[2] ?? 400
-    const origH = parts[3] ?? 400
-    const { scale, translate: { x: tx, y: ty } } = viewport.value
-    return `${tx} ${ty} ${origW / scale} ${origH / scale}`
-  })
-
-  const origViewBoxSize = computed<{ w: number; h: number }>(() => {
+  const parsedDocViewBox = computed(() => {
     if (!document.value) return { w: 400, h: 400 }
     const { rootAttrs } = document.value
     const rawVb = rootAttrs.viewBox ?? `0 0 ${parseFloat(rootAttrs.width ?? '400')} ${parseFloat(rootAttrs.height ?? '400')}`
     const parts = rawVb.split(/[\s,]+/).map(parseFloat)
     return { w: parts[2] ?? 400, h: parts[3] ?? 400 }
   })
+
+  const viewBox = computed(() => {
+    const { w: origW, h: origH } = parsedDocViewBox.value
+    const { scale, translate: { x: tx, y: ty } } = viewport.value
+    return `${tx} ${ty} ${origW / scale} ${origH / scale}`
+  })
+
+  const origViewBoxSize = computed(() => parsedDocViewBox.value)
 
   const ghostSegments = computed<Segment[] | null>(() => {
     if (history.past.length === 0 || activePathIndex.value === null) return null
@@ -228,6 +225,21 @@ export const useEditorStore = defineStore('editor', () => {
     viewport.value = { scale: newScale, translate: { x: newTx, y: newTy } }
   }
 
+  function zoomStep(factor: number) {
+    const { scale, translate: { x: tx, y: ty } } = viewport.value
+    const { w, h } = origViewBoxSize.value
+    const cx = tx + w / (2 * scale)
+    const cy = ty + h / (2 * scale)
+    const newScale = Math.max(0.1, Math.min(50, scale * factor))
+    const newTx = cx - w / (2 * newScale)
+    const newTy = cy - h / (2 * newScale)
+    viewport.value = { scale: newScale, translate: { x: newTx, y: newTy } }
+  }
+
+  function zoomIn() { zoomStep(1.25) }
+  function zoomOut() { zoomStep(1 / 1.25) }
+  function resetZoom() { viewport.value = { scale: 1, translate: { x: 0, y: 0 } } }
+
   return {
     document,
     activePathIndex,
@@ -255,5 +267,8 @@ export const useEditorStore = defineStore('editor', () => {
     nudgeSelection,
     panViewport,
     zoomViewport,
+    zoomIn,
+    zoomOut,
+    resetZoom,
   }
 })

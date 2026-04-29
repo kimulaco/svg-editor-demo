@@ -7,7 +7,7 @@
         width: '100%',
         height: '100%',
         userSelect: 'none',
-        cursor: spaceDown ? (isPanning ? 'grabbing' : 'grab') : 'default',
+        cursor: isPanning ? 'grabbing' : 'grab',
         background: '#1e1e1e',
       }"
       @pointerdown="onViewportPointerDown"
@@ -37,9 +37,13 @@
     </svg>
 
     <!-- HUD overlays (HTML, not SVG) -->
-    <div class="canvas-hud canvas-hud--tl">{{ Math.round(store.viewport.scale * 100) }}%</div>
-    <div v-if="store.activePath" class="canvas-hud canvas-hud--bl d-preview">
+<div v-if="store.activePath" class="canvas-hud canvas-hud--bl d-preview">
       {{ store.activeD }}
+    </div>
+    <div class="canvas-hud canvas-hud--br zoom-controls">
+      <button @click="store.zoomOut">−</button>
+      <button @click="store.resetZoom">{{ Math.round(store.viewport.scale * 100) }}%</button>
+      <button @click="store.zoomIn">+</button>
     </div>
   </div>
 </template>
@@ -56,15 +60,12 @@ const svgRef = ref<SVGSVGElement | null>(null)
 
 const drag = useDrag(svgRef)
 const viewport = useViewport(svgRef)
-const { spaceDown, isPanning } = viewport
+const { isPanning } = viewport
 
 function onViewportPointerDown(e: PointerEvent) {
-  if (spaceDown.value) {
-    viewport.onPointerDown(e)
-  } else {
-    if (e.target === svgRef.value) {
-      store.setSelection(null)
-    }
+  viewport.onPointerDown(e)
+  if (e.target === svgRef.value) {
+    store.setSelection(null)
   }
 }
 
@@ -98,11 +99,6 @@ function onAllPointerUp(_e: PointerEvent) {
   pointer-events: none;
 }
 
-.canvas-hud--tl {
-  top: 8px;
-  left: 8px;
-}
-
 .canvas-hud--bl {
   bottom: 8px;
   left: 8px;
@@ -110,6 +106,36 @@ function onAllPointerUp(_e: PointerEvent) {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.canvas-hud--br {
+  bottom: 8px;
+  right: 8px;
+  left: auto;
+}
+
+.zoom-controls {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  pointer-events: auto;
+}
+
+.zoom-controls button {
+  background: rgba(60, 60, 60, 0.9);
+  color: #ccc;
+  border: 1px solid #555;
+  border-radius: 3px;
+  padding: 2px 8px;
+  font-size: 12px;
+  font-family: monospace;
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.zoom-controls button:hover {
+  background: rgba(80, 80, 80, 0.95);
+  color: #fff;
 }
 
 .d-preview {

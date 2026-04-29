@@ -68,7 +68,7 @@
 
       <!-- handle-in circles -->
       <circle
-        v-for="(item, i) in overlayItems.filter(it => it.handleIn)"
+        v-for="(item, i) in itemsWithHandleIn"
         :key="`hin-${i}`"
         :cx="item.handleIn!.x"
         :cy="item.handleIn!.y"
@@ -82,7 +82,7 @@
 
       <!-- handle-out circles -->
       <circle
-        v-for="(item, i) in overlayItems.filter(it => it.handleOut)"
+        v-for="(item, i) in itemsWithHandleOut"
         :key="`hout-${i}`"
         :cx="item.handleOut!.x"
         :cy="item.handleOut!.y"
@@ -117,8 +117,12 @@ const store = useEditorStore()
 const hitPathRef = ref<SVGPathElement | null>(null)
 
 const scale = computed(() => store.viewport.scale)
-const anchorHalf = computed(() => 4 / scale.value)
-const handleR = computed(() => 3.5 / scale.value)
+const baseUnit = computed(() => {
+  const { w, h } = store.origViewBoxSize
+  return Math.min(w, h) / 100 / scale.value
+})
+const anchorHalf = computed(() => baseUnit.value)
+const handleR = computed(() => baseUnit.value * 0.875)
 
 const activePath = computed(() => store.activePath)
 const activeD = computed(() => activePath.value ? segmentsToD(activePath.value.segments) : '')
@@ -157,6 +161,9 @@ const overlayItems = computed<OverlayItem[]>(() => {
 
   return items
 })
+
+const itemsWithHandleIn = computed(() => overlayItems.value.filter(it => it.handleIn))
+const itemsWithHandleOut = computed(() => overlayItems.value.filter(it => it.handleOut))
 
 function isNodeSelected(segIndex: number): boolean {
   const sel = store.selection
