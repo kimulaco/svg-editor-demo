@@ -198,6 +198,16 @@ export const useEditorStore = defineStore('editor', () => {
     }
   }
 
+  function updateSvg(svgString: string) {
+    try {
+      const doc = parseSvg(svgString)
+      document.value = doc
+      selection.value = null
+    } catch {
+      // ignore parse errors (user may be mid-edit)
+    }
+  }
+
   function panViewport(dx: number, dy: number) {
     viewport.value = {
       ...viewport.value,
@@ -231,6 +241,7 @@ export const useEditorStore = defineStore('editor', () => {
     ghostSegments,
     pathElements,
     loadSvg,
+    updateSvg,
     setActivePath,
     setSelection,
     pushHistory,

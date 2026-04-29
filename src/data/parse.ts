@@ -108,7 +108,7 @@ export function parseSvg(svgString: string): SvgDocument {
   const rawElements: RawElement[] = []
   for (const child of svgEl.children) {
     const tag = child.tagName.toLowerCase()
-    if (tag !== 'path' && tag !== 'defs') {
+    if (tag !== 'path' && tag !== 'defs' && !child.querySelector('path')) {
       rawElements.push({ kind: 'other', raw: child.outerHTML })
     }
   }

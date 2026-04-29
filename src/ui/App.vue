@@ -2,8 +2,11 @@
   <div class="app-layout">
     <ToolBar />
     <div class="main-area">
-      <PathList />
-      <Canvas />
+      <CodeEditor />
+      <div class="right-panel">
+        <PathList />
+        <Canvas />
+      </div>
     </div>
   </div>
 </template>
@@ -11,6 +14,7 @@
 <script setup lang="ts">
 import ToolBar from './ToolBar.vue'
 import PathList from './PathList.vue'
+import CodeEditor from './CodeEditor.vue'
 import Canvas from '../render/Canvas.vue'
 import { useKeyboard } from '../interaction/useKeyboard'
 
@@ -43,6 +47,12 @@ html, body, #app {
 }
 
 .main-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+}
+
+.right-panel {
   display: flex;
   overflow: hidden;
 }

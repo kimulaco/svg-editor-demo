@@ -1,7 +1,6 @@
 <template>
   <div class="toolbar">
     <div class="toolbar-group">
-      <button @click="handlePasteSvg">SVGを貼付け</button>
       <button @click="handleLoadFile">ファイル読込</button>
     </div>
     <div class="toolbar-group">
@@ -15,18 +14,6 @@
 
     <!-- hidden file input -->
     <input ref="fileInputRef" type="file" accept=".svg" style="display:none" @change="onFileChange" />
-
-    <!-- paste fallback modal -->
-    <div v-if="showPasteModal" class="modal-backdrop" @click.self="showPasteModal = false">
-      <div class="modal">
-        <p>SVG文字列を貼り付けてください</p>
-        <textarea v-model="pasteText" rows="8" placeholder="<svg ...>" />
-        <div class="modal-actions">
-          <button @click="showPasteModal = false">キャンセル</button>
-          <button @click="applyPaste">読み込む</button>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -37,30 +24,6 @@ import { serializeSvg } from '../data/serialize'
 
 const store = useEditorStore()
 const fileInputRef = ref<HTMLInputElement | null>(null)
-const showPasteModal = ref(false)
-const pasteText = ref('')
-
-async function handlePasteSvg() {
-  try {
-    const text = await navigator.clipboard.readText()
-    if (text.trim().startsWith('<')) {
-      store.loadSvg(text)
-    } else {
-      pasteText.value = ''
-      showPasteModal.value = true
-    }
-  } catch {
-    pasteText.value = ''
-    showPasteModal.value = true
-  }
-}
-
-function applyPaste() {
-  if (pasteText.value.trim()) {
-    store.loadSvg(pasteText.value)
-  }
-  showPasteModal.value = false
-}
 
 function handleLoadFile() {
   fileInputRef.value?.click()
@@ -135,51 +98,5 @@ button:hover:not(:disabled) {
 button:disabled {
   opacity: 0.4;
   cursor: default;
-}
-
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-.modal {
-  background: #2d2d2d;
-  border: 1px solid #555;
-  border-radius: 6px;
-  padding: 20px;
-  width: 480px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.modal p {
-  color: #ccc;
-  font-size: 13px;
-  margin: 0;
-}
-
-.modal textarea {
-  background: #1e1e1e;
-  color: #ccc;
-  border: 1px solid #555;
-  border-radius: 3px;
-  padding: 8px;
-  font-family: monospace;
-  font-size: 11px;
-  resize: vertical;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
 }
 </style>
