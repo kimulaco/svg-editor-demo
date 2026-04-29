@@ -6,17 +6,19 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "knip": "knip"
   },
   "dependencies": {
-    "pinia": "^2.3.1",
+    "pinia": "^3.0.4",
     "svgpath": "^2.6.0",
-    "vue": "^3.5.13"
+    "vue": "^3.5.33"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.2.1",
-    "typescript": "~5.7.2",
-    "vite": "^6.3.1",
-    "vue-tsc": "^2.2.8"
+    "@vitejs/plugin-vue": "^6.0.6",
+    "knip": "^6.8.0",
+    "typescript": "~6.0.3",
+    "vite": "^8.0.10",
+    "vue-tsc": "^3.2.7"
   }
 }

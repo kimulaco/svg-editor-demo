@@ -6,13 +6,13 @@ import { moveNode, moveHandleIn, moveHandleOut, deleteNode, addNodeAt } from '..
 import type { SvgDocument, SvgElement, PathElement } from '../data/parse'
 import type { Point, Segment } from '../data/pathString'
 
-export type Selection =
+type Selection =
   | { type: 'node'; pathIndex: number; segIndex: number }
   | { type: 'handle-in'; pathIndex: number; segIndex: number }
   | { type: 'handle-out'; pathIndex: number; segIndex: number }
   | null
 
-export interface Viewport {
+interface Viewport {
   scale: number
   translate: { x: number; y: number }
 }

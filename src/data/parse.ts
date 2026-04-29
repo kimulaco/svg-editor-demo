@@ -9,7 +9,7 @@ export interface PathElement {
   segments: Segment[]
 }
 
-export interface RawElement {
+interface RawElement {
   kind: 'other'
   raw: string
 }
