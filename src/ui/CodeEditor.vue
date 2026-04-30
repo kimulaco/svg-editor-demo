@@ -24,7 +24,7 @@ let timer: ReturnType<typeof setTimeout> | null = null
 watch(() => store.document, (doc) => {
   if (isFocused.value) return
   localText.value = doc ? serializeSvg(doc) : ''
-}, { deep: true })
+}, { deep: true, immediate: true })
 
 function onInput() {
   if (timer) clearTimeout(timer)

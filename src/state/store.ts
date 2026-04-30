@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { parseSvg } from '../data/parse'
+import { serializeSvg } from '../data/serialize'
 import { segmentsToD } from '../data/pathString'
 import { moveNode, moveHandleIn, moveHandleOut, deleteNode, addNodeAt } from '../data/segments'
 import type { SvgDocument, SvgElement, PathElement } from '../data/parse'
@@ -248,6 +249,39 @@ export const useEditorStore = defineStore('editor', () => {
   function zoomIn() { zoomStep(1.25) }
   function zoomOut() { zoomStep(1 / 1.25) }
   function resetZoom() { viewport.value = { scale: 1, translate: { x: 0, y: 0 } } }
+
+  // ---- persistence ----
+
+  const STORAGE_KEY = 'svg-editor'
+
+  function saveToStorage() {
+    if (!document.value) return
+    try {
+      localStorage.setItem(`${STORAGE_KEY}:svg`, serializeSvg(document.value))
+      localStorage.setItem(`${STORAGE_KEY}:viewport`, JSON.stringify(viewport.value))
+      localStorage.setItem(`${STORAGE_KEY}:activePathIndex`, JSON.stringify(activePathIndex.value))
+    } catch { /* storage full or private browsing */ }
+  }
+
+  function loadFromStorage() {
+    const svgStr = localStorage.getItem(`${STORAGE_KEY}:svg`)
+    if (!svgStr) return
+    try {
+      loadSvg(svgStr)
+      const vp = localStorage.getItem(`${STORAGE_KEY}:viewport`)
+      if (vp) viewport.value = JSON.parse(vp)
+      const api = localStorage.getItem(`${STORAGE_KEY}:activePathIndex`)
+      if (api !== null) activePathIndex.value = JSON.parse(api)
+    } catch { /* corrupt data */ }
+  }
+
+  let saveTimer: ReturnType<typeof setTimeout> | null = null
+  watch([document, viewport, activePathIndex], () => {
+    if (saveTimer) clearTimeout(saveTimer)
+    saveTimer = setTimeout(saveToStorage, 300)
+  }, { deep: true })
+
+  loadFromStorage()
 
   return {
     document,
