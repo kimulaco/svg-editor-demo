@@ -10,6 +10,7 @@
     "knip": "knip"
   },
   "dependencies": {
+    "monaco-editor": "^0.55.1",
     "pinia": "^3.0.4",
     "svgpath": "^2.6.0",
     "vue": "^3.5.33"
