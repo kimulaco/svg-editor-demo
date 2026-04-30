@@ -52,10 +52,11 @@ Pointer capture is set on the SVG root element (`svgRef.value.setPointerCapture`
 
 ### Key files
 
-- `src/state/store.ts` — single Pinia store; all mutable state and actions
+- `src/state/store.ts` — single Pinia store; all mutable state and actions. `updatePathAttr(pathIndex, attrName, value)` updates a path's SVG attribute (fill, stroke, etc.) with history push.
 - `src/data/pathString.ts` — `Segment` types, `dToSegments`, `segmentToD`, `segmentsToD`
 - `src/data/segments.ts` — pure functions: `moveNode`, `moveHandleIn/Out`, `addNodeAt` (de Casteljau), `deleteNode`
 - `src/data/parse.ts` — `parseSvg`: flattens nested `<g>` transforms, skips `clipPath`/`mask`/`symbol`
-- `src/render/PathLayer.vue` — most complex component; draws all paths + active path overlay (anchors, handles, ghost, dblclick hit area)
+- `src/render/PathLayer.vue` — most complex component; draws all paths + active path overlay (anchors, handles, ghost, dblclick hit area). All paths render their actual `attrs.stroke`; the active path is indicated by a separate dashed blue overlay path, not by overriding stroke color.
+- `src/ui/PathList.vue` — path list sidebar; each item has fill and stroke color swatches that trigger hidden `<input type="color">` pickers on click.
 - `src/interaction/useDrag.ts` — drag composable (absolute-delta approach to avoid float drift)
 - `src/interaction/useKeyboard.ts` — Cmd/Ctrl+Z undo, Cmd/Ctrl+Shift+Z redo, Delete/Backspace node delete, arrow nudge
