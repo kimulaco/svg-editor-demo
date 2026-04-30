@@ -14,10 +14,26 @@
       :class="{ active: store.activePathIndex === i }"
       @click="() => store.setActivePath(i)"
     >
-      <span
-        class="path-swatch"
-        :style="{ background: el.attrs.fill && el.attrs.fill !== 'none' ? el.attrs.fill : '#888' }"
-      />
+      <div class="swatches">
+        <label class="swatch-label" title="fill" @click.stop>
+          <div class="swatch" :style="{ background: fillColor(el) }" />
+          <input
+            type="color"
+            class="color-input"
+            :value="toHex(el.attrs.fill)"
+            @change="(e) => onColorChange(i, 'fill', (e.target as HTMLInputElement).value)"
+          />
+        </label>
+        <label class="swatch-label" title="stroke" @click.stop>
+          <div class="swatch" :style="{ background: strokeColor(el) }" />
+          <input
+            type="color"
+            class="color-input"
+            :value="toHex(el.attrs.stroke)"
+            @change="(e) => onColorChange(i, 'stroke', (e.target as HTMLInputElement).value)"
+          />
+        </label>
+      </div>
       <span class="path-label">path[{{ i }}]</span>
     </div>
   </div>
@@ -25,8 +41,30 @@
 
 <script setup lang="ts">
 import { useEditorStore } from '../state/store'
+import type { PathElement } from '../data/parse'
 
 const store = useEditorStore()
+
+function fillColor(el: PathElement): string {
+  const v = el.attrs.fill
+  if (!v || v === 'none') return 'transparent'
+  return v
+}
+
+function strokeColor(el: PathElement): string {
+  const v = el.attrs.stroke
+  if (!v || v === 'none') return 'transparent'
+  return v
+}
+
+function toHex(color: string | undefined): string {
+  if (!color || color === 'none') return '#000000'
+  return color.startsWith('#') ? color : '#000000'
+}
+
+function onColorChange(pathIndex: number, attr: 'fill' | 'stroke', value: string) {
+  store.updatePathAttr(pathIndex, attr, value)
+}
 </script>
 
 <style scoped>
@@ -74,12 +112,36 @@ const store = useEditorStore()
   color: #fff;
 }
 
-.path-swatch {
+.swatches {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.swatch-label {
+  display: block;
+  cursor: crosshair;
+  position: relative;
+}
+
+.swatch {
   width: 12px;
   height: 12px;
   border-radius: 2px;
-  flex-shrink: 0;
   border: 1px solid #555;
+}
+
+.color-input {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.swatch-label:focus-within .swatch {
+  outline: 2px solid #3378d8;
+  outline-offset: 1px;
 }
 
 .path-label {

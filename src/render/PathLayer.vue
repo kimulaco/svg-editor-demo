@@ -6,8 +6,8 @@
       :key="el.id"
       :d="segmentsToD(el.segments)"
       :fill="el.attrs.fill ?? 'none'"
-      :stroke="i === store.activePathIndex ? '#3378d8' : (el.attrs.stroke && el.attrs.stroke !== 'none' ? el.attrs.stroke : '#666')"
-      :stroke-width="i === store.activePathIndex ? (1.5 / scale) : (el.attrs['stroke-width'] ? Number(el.attrs['stroke-width']) / scale : 0.5 / scale)"
+      :stroke="el.attrs.stroke && el.attrs.stroke !== 'none' ? el.attrs.stroke : '#666'"
+      :stroke-width="el.attrs['stroke-width'] ? Number(el.attrs['stroke-width']) / scale : 0.5 / scale"
       :opacity="el.attrs.opacity ?? '1'"
       :style="{ cursor: i === store.activePathIndex ? 'default' : 'pointer' }"
       @click="() => store.setActivePath(i)"
@@ -15,6 +15,16 @@
 
     <!-- active path overlay -->
     <template v-if="activePath">
+      <!-- selection indicator -->
+      <path
+        :d="activeD"
+        fill="none"
+        stroke="#3378d8"
+        :stroke-width="1.5 / scale"
+        :stroke-dasharray="`${4/scale} ${3/scale}`"
+        pointer-events="none"
+      />
+
       <!-- ghost layer -->
       <GhostLayer />
 

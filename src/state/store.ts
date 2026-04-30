@@ -146,6 +146,15 @@ export const useEditorStore = defineStore('editor', () => {
     setActiveSegments(addNodeAt(getActiveSegments(), segIndex, t))
   }
 
+  function updatePathAttr(pathIndex: number, attrName: string, value: string) {
+    const path = pathElements.value[pathIndex]
+    if (!path || !document.value) return
+    const idx = document.value.elements.indexOf(path)
+    if (idx === -1) return
+    pushHistory()
+    document.value.elements[idx] = { ...path, attrs: { ...path.attrs, [attrName]: value } }
+  }
+
   function deleteNodeAction(segIndex: number) {
     if (segIndex === 0) return
     setActiveSegments(deleteNode(getActiveSegments(), segIndex))
@@ -264,6 +273,7 @@ export const useEditorStore = defineStore('editor', () => {
     moveHandleOut: moveHandleOutAction,
     addNode: addNodeAction,
     deleteNode: deleteNodeAction,
+    updatePathAttr,
     nudgeSelection,
     panViewport,
     zoomViewport,
